@@ -24,7 +24,7 @@ def test_sql_connection():
             "DRIVER={ODBC Driver 17 for SQL Server};"
             "SERVER=localhost;"
             "DATABASE=master;"  # Database mặc định để kiểm tra kết nối
-            "UID=trin;"         # Tên user
+            "UID=trim;"         # Tên user
             "PWD=123;"          # Mật khẩu
         )
         # Kết nối tới SQL Server
@@ -56,7 +56,7 @@ def get_db_connection():
         "DRIVER={ODBC Driver 17 for SQL Server};"
         "SERVER=localhost;"
         "DATABASE=fci_project;"   # Tên cơ sở dữ liệu
-        "UID=trin;"               # Tên user
+        "UID=trim;"               # Tên user
         "PWD=123;"                # Mật khẩu
     )
     return pyodbc.connect(conn_str)
@@ -101,7 +101,7 @@ def get_products(category: str = Query(...)):
             "category": product.category
         })
     
-    return {"products": result}
+    return result
 
 # API để xóa sản phẩm theo ID
 @app.delete("/products/{id}")
@@ -179,3 +179,29 @@ def update_product(id: int, product: Product):
     conn.close()
     
     return {"message": "Product updated successfully", "product": product}
+
+# API để lấy thông tin sản phẩm theo ID
+@app.get("/products/{id}")
+def read_product(id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Truy vấn sản phẩm theo ID
+    cursor.execute("SELECT * FROM Products WHERE id = ?", id)
+    product = cursor.fetchone()
+    
+    conn.close()
+    
+    if product:
+        # Chuyển đổi kết quả thành dictionary
+        product_dict = {
+            "id": product.id,
+            "name": product.name,
+            "quota": product.quota,
+            "price": product.price,
+            "image": product.image,
+            "category": product.category
+        }
+        return product_dict
+    else:
+        raise HTTPException(status_code=404, detail="Product not found")
