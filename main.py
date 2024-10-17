@@ -1,8 +1,20 @@
 from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
 import pyodbc
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 app = FastAPI()
+
+# Thêm middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Bạn có thể thay đổi thành danh sách các origin được phép
+    allow_credentials=True,
+    allow_methods=["*"],  # Cho phép tất cả các phương thức (GET, POST, PUT, DELETE, ...)
+    allow_headers=["*"],  # Cho phép tất cả các header
+)
 
 # Hàm kiểm tra kết nối với SQL Server
 def test_sql_connection():
