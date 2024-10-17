@@ -1,6 +1,3 @@
-# Hướng dẫn chạy backend
-Đầu tiên, tạo database bằng cách copy nội dung trong file data.sql vào sqlserver để chạy
-```sql
 use master
 IF EXISTS (SELECT * FROM sys.databases WHERE name = 'fci_project')
 BEGIN
@@ -48,25 +45,3 @@ VALUES
 
 
 SELECT * FROM Products;
-```
-
-Sau đó, cài các thư viện cần thiết:
-```bash
-pip install -r requirements.txt
-```
-
-Chạy backend:
-```bash
-python -m uvicorn main:app --reload
-```
-
-Các api:
-
-`http://localhost:8000/`: 
-Kiểm tra xem app chạy chưa
-`http://localhost:8000/TestConnect`: Kiểm tra xem kết nối db oke không
-`http://localhost:8000/products?category=all`: Lấy all
-`http://localhost:8000/products?category=caogot`
-`http://localhost:8000/products?category=sport`
-`http://localhost:8000/products?category=baby`
-`http://localhost:8000/products?category=phukien`
