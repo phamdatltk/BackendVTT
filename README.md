@@ -65,8 +65,37 @@ Các api:
 `http://localhost:8000/`: 
 Kiểm tra xem app chạy chưa
 `http://localhost:8000/TestConnect`: Kiểm tra xem kết nối db oke không
+
+## GET
 `http://localhost:8000/products?category=all`: Lấy all
 `http://localhost:8000/products?category=caogot`
 `http://localhost:8000/products?category=sport`
 `http://localhost:8000/products?category=baby`
 `http://localhost:8000/products?category=phukien`
+
+## CREATE
+curl --location 'http://localhost:8000/products' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "Giầy thể thao XYZ",
+  "quota": 10,
+  "price": 299.99,
+  "image": "url_to_image.jpg",
+  "category": "Giầy thể thao"
+}
+'
+
+## DELETE
+curl --location --request DELETE 'http://localhost:8000/products/1'
+
+## UPDATE
+curl --location --request PUT 'http://localhost:8000/products/2' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "Giầy thể thao ABC",
+  "quota": 15,
+  "price": 349.99,
+  "image": "url_to_new_image.jpg",
+  "category": "Giầy thể thao"
+}
+'

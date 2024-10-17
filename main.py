@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
+from pydantic import BaseModel
 import pyodbc
 
 app = FastAPI()
@@ -89,3 +90,80 @@ def get_products(category: str = Query(...)):
         })
     
     return {"products": result}
+
+# API để xóa sản phẩm theo ID
+@app.delete("/products/{id}")
+def delete_product(id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Kiểm tra xem sản phẩm có tồn tại không
+    cursor.execute("SELECT * FROM Products WHERE id = ?", id)
+    product = cursor.fetchone()
+    
+    if not product:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Xóa sản phẩm
+    cursor.execute("DELETE FROM Products WHERE id = ?", id)
+    conn.commit()  # Lưu thay đổi
+    conn.close()
+    
+    return {"message": "Product deleted successfully"}
+
+# Định nghĩa model cho sản phẩm
+class Product(BaseModel):
+    name: str
+    quota: int
+    price: float
+    image: str
+    category: str
+    
+# API để thêm sản phẩm mới
+@app.post("/products")
+def create_product(product: Product):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Thêm sản phẩm vào cơ sở dữ liệu
+    cursor.execute(
+        "INSERT INTO Products (name, quota, price, image, category) VALUES (?, ?, ?, ?, ?)",
+        product.name,
+        product.quota,
+        product.price,
+        product.image,
+        product.category
+    )
+    conn.commit()  # Lưu thay đổi
+    conn.close()
+
+    return {"message": "Product created successfully", "product": product}
+
+@app.put("/products/{id}")
+def update_product(id: int, product: Product):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Kiểm tra xem sản phẩm có tồn tại không
+    cursor.execute("SELECT * FROM Products WHERE id = ?", id)
+    existing_product = cursor.fetchone()
+    
+    if not existing_product:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Cập nhật thông tin sản phẩm
+    cursor.execute(
+        "UPDATE Products SET name = ?, quota = ?, price = ?, image = ?, category = ? WHERE id = ?",
+        product.name,
+        product.quota,
+        product.price,
+        product.image,
+        product.category,
+        id
+    )
+    conn.commit()  # Lưu thay đổi
+    conn.close()
+    
+    return {"message": "Product updated successfully", "product": product}
